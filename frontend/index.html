@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Cloning Detection System</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0a1628 100%);
+            --accent-blue: #00d4ff;
+            --accent-purple: #7c3aed;
+            --glow-blue: rgba(0, 212, 255, 0.4);
+            --glow-purple: rgba(124, 58, 237, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Grid */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Floating Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.3;
+            animation: float 20s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-blue);
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-purple);
+            bottom: -50px;
+            left: -50px;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        /* Glass Card Effect */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 20px;
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), transparent);
+        }
+
+        /* Amplifier Style Header */
+        .amp-header {
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+            border: 2px solid #2a2a4a;
+            border-radius: 15px;
+            padding: 30px;
+            position: relative;
+            box-shadow:
+                inset 0 2px 10px rgba(0, 0, 0, 0.5),
+                0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .amp-header::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.3), transparent);
+            border-radius: 2px;
+        }
+
+        /* VU Meter Decorations */
+        .vu-meter {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .vu-bar {
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(to top, #00d4ff, #7c3aed);
+            border-radius: 2px;
+            animation: vu-dance 0.5s ease-in-out infinite;
+            opacity: 0.8;
+        }
+
+        .vu-bar:nth-child(1) {
+            animation-delay: 0s;
+            height: 12px;
+        }
+
+        .vu-bar:nth-child(2) {
+            animation-delay: 0.1s;
+            height: 18px;
+        }
+
+        .vu-bar:nth-child(3) {
+            animation-delay: 0.2s;
+            height: 25px;
+        }
+
+        .vu-bar:nth-child(4) {
+            animation-delay: 0.15s;
+            height: 20px;
+        }
+
+        .vu-bar:nth-child(5) {
+            animation-delay: 0.25s;
+            height: 30px;
+        }
+
+        .vu-bar:nth-child(6) {
+            animation-delay: 0.1s;
+            height: 22px;
+        }
+
+        .vu-bar:nth-child(7) {
+            animation-delay: 0.3s;
+            height: 15px;
+        }
+
+        .vu-bar:nth-child(8) {
+            animation-delay: 0.05s;
+            height: 28px;
+        }
+
+        .vu-bar:nth-child(9) {
+            animation-delay: 0.2s;
+            height: 18px;
+        }
+
+        .vu-bar:nth-child(10) {
+            animation-delay: 0.15s;
+            height: 12px;
+        }
+
+        @keyframes vu-dance {
+
+            0%,
+            100% {
+                transform: scaleY(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scaleY(0.5);
+                opacity: 0.5;
+            }
+        }
+
+        /* Title Styling */
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 50%, #00d4ff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            animation: shine 3s linear infinite;
+            text-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        .subtitle {
+            color: #64748b;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Tab Navigation */
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(10, 15, 30, 0.8);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 12px;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 12px;
+        }
+
+        .tab-btn:hover::before {
+            opacity: 1;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .tab-btn.active::before {
+            display: none;
+        }
+
+        /* Section Cards */
+        .section-card {
+            padding: 30px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #00d4ff;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #00d4ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00d4ff;
+            animation: pulse-glow 2s infinite;
+        }
+
+        @keyframes pulse-glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 5px #00d4ff;
+            }
+
+            50% {
+                box-shadow: 0 0 20px #00d4ff, 0 0 40px #00d4ff;
+            }
+        }
+
+        .section-desc {
+            color: #94a3b8;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        /* Input Styling */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .text-input,
+        .file-input-wrapper {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(10, 15, 30, 0.8);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            color: #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .text-input::placeholder {
+            color: #475569;
+        }
+
+        /* File Input */
+        .file-input-wrapper {
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(124, 58, 237, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .file-icon svg {
+            width: 24px;
+            height: 24px;
+            color: #00d4ff;
+        }
+
+        .file-text {
+            flex: 1;
+        }
+
+        .file-text-main {
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+
+        .file-text-sub {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 2px;
+        }
+
+        /* Action Buttons */
+        .action-btn {
+            width: 100%;
+            padding: 18px 30px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .action-btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-predict {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-embed {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-embed:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-verify {
+            background: linear-gradient(135deg, #00d4ff, #0891b2);
+            color: #0f172a;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Results Card */
+        .results-card {
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .results-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: #00d4ff;
+        }
+
+        .result-content {
+            background: rgba(10, 15, 30, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        /* Result Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .status-real {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-fake {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-unknown {
+            background: rgba(0, 212, 255, 0.2);
+            color: #00d4ff;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        /* Waveform Animation */
+        .waveform {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            height: 40px;
+            margin: 20px 0;
+        }
+
+        .wave-bar {
+            width: 4px;
+            background: linear-gradient(to top, #00d4ff, #7c3aed);
+            border-radius: 2px;
+            animation: wave 1s ease-in-out infinite;
+        }
+
+        .wave-bar:nth-child(1) {
+            height: 10px;
+            animation-delay: 0s;
+        }
+
+        .wave-bar:nth-child(2) {
+            height: 20px;
+            animation-delay: 0.1s;
+        }
+
+        .wave-bar:nth-child(3) {
+            height: 30px;
+            animation-delay: 0.2s;
+        }
+
+        .wave-bar:nth-child(4) {
+            height: 25px;
+            animation-delay: 0.3s;
+        }
+
+        .wave-bar:nth-child(5) {
+            height: 35px;
+            animation-delay: 0.4s;
+        }
+
+        .wave-bar:nth-child(6) {
+            height: 20px;
+            animation-delay: 0.5s;
+        }
+
+        .wave-bar:nth-child(7) {
+            height: 15px;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes wave {
+
+            0%,
+            100% {
+                transform: scaleY(1);
+            }
+
+            50% {
+                transform: scaleY(1.5);
+            }
+        }
+
+        /* Extracted Data Box */
+        .extracted-box {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .extracted-label {
+            color: #64748b;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .extracted-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: #00d4ff;
+            word-break: break-all;
+        }
+
+        /* Hidden class */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 1.8rem;
+            }
+
+            .tab-btn {
+                padding: 12px 10px;
+                font-size: 0.8rem;
+            }
+
+            .section-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Effects -->
+    <div class="bg-grid"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="p-6 relative z-10">
+        <div class="max-w-4xl mx-auto">
+
+            <!-- Amplifier Style Header -->
+            <div class="amp-header mb-8">
+                <h1 class="title">Voice Signal Integrity System</h1>
+                <p class="subtitle">Advanced Audio Analysis & Protection</p>
+                <div class="vu-meter">
+                    <div class="vu-bar"></div>
+                    <div class="vu-bar"></div>
+                    <div class="vu-bar"></div>
+                    <div class="vu-bar"></div>
+                    <div class="vu-bar"></div>
+                    <div class="vu-bar"></div>
+                    <div class="vu-bar"></div>
+                    <div class="vu-bar"></div>
+                    <div class="vu-bar"></div>
+                    <div class="vu-bar"></div>
+                </div>
+            </div>
+
+            <!-- Results Display -->
+            <div id="results" class="glass-card results-card p-6 hidden">
+                <div class="results-header">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00d4ff" stroke-width="2">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    </svg>
+                    <h2>Analysis Results</h2>
+                </div>
+                <div id="result-output" class="result-content"></div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-container mb-6">
+                <button class="tab-btn active" data-target="predict-section">
+                    🎯 AI Classification
+                </button>
+                <button class="tab-btn" data-target="embed-section">
+                    🔐 Watermark Embed
+                </button>
+                <button class="tab-btn" data-target="verify-section">
+                    🔍 Watermark Verify
+                </button>
+            </div>
+
+            <div id="test-sections">
+                <!-- 1. AI Classification Section -->
+                <div id="predict-section" class="test-section glass-card section-card">
+                    <h2 class="section-title">AI Voice Cloning Detection</h2>
+                    <p class="section-desc">
+                        Utilizes deep learning to analyze acoustic features and classify audio as authentic or
+                        synthetically generated.
+                    </p>
+
+                    <div class="input-group">
+                        <label class="input-label">Upload Audio File</label>
+                        <div class="file-input-wrapper">
+                            <div class="file-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 18V5l12-2v13" />
+                                    <circle cx="6" cy="18" r="3" />
+                                    <circle cx="18" cy="16" r="3" />
+                                </svg>
+                            </div>
+                            <div class="file-text">
+                                <div class="file-text-main" id="predict-file-name">Choose WAV file...</div>
+                                <div class="file-text-sub">Drag & drop or click to browse</div>
+                            </div>
+                            <input type="file" id="predictFile" accept=".wav"
+                                onchange="updateFileName(this, 'predict-file-name')">
+                        </div>
+                    </div>
+
+                    <button id="predictButton"
+                        onclick="runTest('/predict', 'predictFile', 'predictButton', 'predict-text')"
+                        class="action-btn btn-predict">
+                        <span id="predict-text">Analyze Audio</span>
+                    </button>
+                </div>
+
+                <!-- 2. Watermark Embedding Section -->
+                <div id="embed-section" class="test-section glass-card section-card hidden">
+                    <h2 class="section-title">Watermark Embedding</h2>
+                    <p class="section-desc">
+                        Invisibly encode ownership data into audio using advanced spectral domain techniques with
+                        Reed-Solomon error correction.
+                    </p>
+
+                    <div class="input-group">
+                        <label class="input-label">Watermark Data</label>
+                        <input type="text" id="watermarkData"
+                            placeholder="Enter unique identifier (e.g., User ID, License Key)" class="text-input">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Upload Audio File</label>
+                        <div class="file-input-wrapper">
+                            <div class="file-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 18V5l12-2v13" />
+                                    <circle cx="6" cy="18" r="3" />
+                                    <circle cx="18" cy="16" r="3" />
+                                </svg>
+                            </div>
+                            <div class="file-text">
+                                <div class="file-text-main" id="embed-file-name">Choose WAV file...</div>
+                                <div class="file-text-sub">Drag & drop or click to browse</div>
+                            </div>
+                            <input type="file" id="embedFile" accept=".wav"
+                                onchange="updateFileName(this, 'embed-file-name')">
+                        </div>
+                    </div>
+
+                    <button id="embedButton" onclick="runEmbedTest()" class="action-btn btn-embed">
+                        <span id="embed-text">Embed & Download</span>
+                    </button>
+                </div>
+
+                <!-- 3. Watermark Verification Section -->
+                <div id="verify-section" class="test-section glass-card section-card hidden">
+                    <h2 class="section-title">Watermark Extraction</h2>
+                    <p class="section-desc">
+                        Detect and extract hidden watermarks from audio files to verify authenticity and ownership.
+                    </p>
+
+                    <div class="input-group">
+                        <label class="input-label">Upload Watermarked Audio</label>
+                        <div class="file-input-wrapper">
+                            <div class="file-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 18V5l12-2v13" />
+                                    <circle cx="6" cy="18" r="3" />
+                                    <circle cx="18" cy="16" r="3" />
+                                </svg>
+                            </div>
+                            <div class="file-text">
+                                <div class="file-text-main" id="verify-file-name">Choose WAV file...</div>
+                                <div class="file-text-sub">Drag & drop or click to browse</div>
+                            </div>
+                            <input type="file" id="verifyFile" accept=".wav"
+                                onchange="updateFileName(this, 'verify-file-name')">
+                        </div>
+                    </div>
+
+                    <button id="verifyButton" onclick="runTest('/verify', 'verifyFile', 'verifyButton', 'verify-text')"
+                        class="action-btn btn-verify">
+                        <span id="verify-text">Extract Watermark</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://127.0.0.1:5000';
+
+        // Tab switching
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const sections = document.querySelectorAll('.test-section');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    sections.forEach(s => s.classList.add('hidden'));
+
+                    tab.classList.add('active');
+                    const target = document.getElementById(tab.dataset.target);
+                    if (target) target.classList.remove('hidden');
+                });
+            });
+        });
+
+        function updateFileName(input, labelId) {
+            const label = document.getElementById(labelId);
+            if (input.files.length > 0) {
+                label.textContent = input.files[0].name;
+                label.style.color = '#00d4ff';
+            }
+        }
+
+        function showLoading(buttonElementId, textSpanElementId) {
+            const button = document.getElementById(buttonElementId);
+            const textSpan = document.getElementById(textSpanElementId);
+
+            if (button && textSpan) {
+                button.dataset.originalText = textSpan.textContent;
+                textSpan.innerHTML = '<span class="spinner"></span>Processing...';
+                button.disabled = true;
+            }
+        }
+
+        function hideLoading(buttonElementId, textSpanElementId) {
+            const button = document.getElementById(buttonElementId);
+            const textSpan = document.getElementById(textSpanElementId);
+
+            if (button && textSpan) {
+                textSpan.textContent = button.dataset.originalText;
+                button.disabled = false;
+            }
+        }
+
+        function displayResult(data) {
+            const outputElement = document.getElementById('result-output');
+            const resultsCard = document.getElementById('results');
+            resultsCard.classList.remove('hidden');
+
+            if (data.error) {
+                outputElement.innerHTML = `
+                    <div class="status-badge status-fake" style="margin-bottom: 15px;">
+                        ⚠️ Error
+                    </div>
+                    <div style="color: #ef4444; font-weight: 500;">${data.error}</div>
+                    ${data.details ? `<div style="color: #94a3b8; margin-top: 8px; font-size: 0.9rem;">${data.details}</div>` : ''}
+                `;
+                return;
+            }
+
+            let html = '';
+
+            // Prediction Result
+            if (data.result && data.confidence && !data.extracted_watermark && data.extracted_bits === undefined) {
+                const isReal = data.result === 'REAL';
+                html += `
+                    <div class="waveform">
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div class="status-badge ${isReal ? 'status-real' : 'status-fake'}">
+                            ${isReal ? '✓' : '✗'} ${data.result}
+                        </div>
+                    </div>
+                    <div class="extracted-box">
+                        <div class="extracted-label">Confidence Level</div>
+                        <div class="extracted-value">${data.confidence}%</div>
+                    </div>
+                    ${data.model_accuracy ? `
+                        <div class="extracted-box" style="margin-top: 10px; background: rgba(124, 58, 237, 0.1); border-color: rgba(124, 58, 237, 0.3);">
+                            <div class="extracted-label">Model Accuracy</div>
+                            <div class="extracted-value" style="color: #a78bfa;">${data.model_accuracy}%</div>
+                        </div>
+                    ` : ''}
+                `;
+            }
+
+            // Embed Result
+            if (data.success && (data.output_path || data.filename || data.bits_embedded)) {
+                html += `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div class="status-badge status-real">
+                            ✓ Watermark Embedded
+                        </div>
+                    </div>
+                    ${data.bits_embedded ? `
+                        <div class="extracted-box">
+                            <div class="extracted-label">Data Embedded</div>
+                            <div class="extracted-value">${data.bits_embedded}</div>
+                        </div>
+                    ` : ''}
+                    ${data.filename ? `
+                        <div class="extracted-box" style="margin-top: 10px;">
+                            <div class="extracted-label">Output File</div>
+                            <div class="extracted-value">${data.filename}</div>
+                        </div>
+                    ` : ''}
+                    ${data.file_size ? `
+                        <div class="extracted-box" style="margin-top: 10px;">
+                            <div class="extracted-label">File Size</div>
+                            <div class="extracted-value">${data.file_size}</div>
+                        </div>
+                    ` : ''}
+                `;
+            }
+
+            // Verify Result
+            if (data.result && (data.extracted_bits !== undefined || data.extracted_watermark)) {
+                const isReal = data.result === 'REAL';
+                const isUnknown = data.result === 'UNKNOWN';
+                const statusClass = isReal ? 'status-real' : (isUnknown ? 'status-unknown' : 'status-fake');
+
+                html += `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div class="status-badge ${statusClass}">
+                            ${isReal ? '✓' : isUnknown ? '?' : '✗'} ${data.result}
+                        </div>
+                    </div>
+                `;
+
+                if (data.extracted_watermark) {
+                    html += `
+                        <div class="extracted-box">
+                            <div class="extracted-label">Extracted Watermark</div>
+                            <div class="extracted-value">"${data.extracted_watermark}"</div>
+                        </div>
+                    `;
+                }
+
+                if (data.original_watermark) {
+                    html += `
+                        <div class="extracted-box" style="margin-top: 10px; background: rgba(124, 58, 237, 0.1); border-color: rgba(124, 58, 237, 0.3);">
+                            <div class="extracted-label">Original Watermark</div>
+                            <div class="extracted-value" style="color: #a78bfa;">"${data.original_watermark}"</div>
+                        </div>
+                    `;
+                }
+
+                if (data.message) {
+                    html += `<div style="color: #94a3b8; margin-top: 15px; font-size: 0.9rem;">${data.message}</div>`;
+                }
+            }
+
+            if (!html && data.message) {
+                html = `<div style="color: #10b981;">${data.message}</div>`;
+            }
+
+            if (!html) {
+                html = `<pre style="color: #94a3b8; overflow-x: auto;">${JSON.stringify(data, null, 2)}</pre>`;
+            }
+
+            outputElement.innerHTML = html;
+        }
+
+        async function runTest(endpoint, fileInputId, buttonElementId, textSpanElementId) {
+            const fileInput = document.getElementById(fileInputId);
+            const file = fileInput.files[0];
+
+            if (!file) {
+                displayResult({ error: "Please select a .wav file first." });
+                return;
+            }
+
+            showLoading(buttonElementId, textSpanElementId);
+
+            const formData = new FormData();
+            formData.append('audio', file);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.status !== 200) {
+                    const errorText = await response.text();
+                    let errorDetails = errorText.substring(0, 500).trim();
+                    try {
+                        const jsonError = JSON.parse(errorText.trim());
+                        errorDetails = jsonError.error;
+                    } catch { }
+
+                    displayResult({
+                        error: `Server responded with status ${response.status}`,
+                        details: errorDetails
+                    });
+                    return;
+                }
+
+                const result = await response.json();
+                displayResult(result);
+
+            } catch (error) {
+                console.error('API Error:', error);
+                displayResult({ error: "Network or API call failed.", details: error.toString() });
+            } finally {
+                hideLoading(buttonElementId, textSpanElementId);
+            }
+        }
+
+        async function runEmbedTest() {
+            const fileInput = document.getElementById('embedFile');
+            const watermarkInput = document.getElementById('watermarkData');
+            const file = fileInput.files[0];
+            const watermarkData = watermarkInput.value;
+
+            if (!file) {
+                displayResult({ error: "Please select a .wav file first." });
+                return;
+            }
+            if (!watermarkData) {
+                displayResult({ error: "Please enter watermark data." });
+                return;
+            }
+
+            showLoading('embedButton', 'embed-text');
+
+            const formData = new FormData();
+            formData.append('audio', file);
+            formData.append('bits', watermarkData);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/embed`, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.status !== 200) {
+                    const errorText = await response.text();
+                    displayResult({
+                        error: `Server responded with status ${response.status}`,
+                        details: errorText.substring(0, 500)
+                    });
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (result.embedded_audio_base64) {
+                    try {
+                        const byteCharacters = atob(result.embedded_audio_base64);
+                        const byteNumbers = new Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        const blob = new Blob([byteArray], { type: 'audio/wav' });
+
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = result.filename || 'watermarked_voice.wav';
+                        document.body.appendChild(a);
+                        a.click();
+
+                        setTimeout(() => {
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+                        }, 100);
+
+                        displayResult({
+                            success: true,
+                            message: result.message || 'Watermark embedded successfully',
+                            filename: a.download,
+                            bits_embedded: result.bits_embedded,
+                            file_size: `${(blob.size / 1024).toFixed(2)} KB`
+                        });
+                    } catch (decodeError) {
+                        displayResult({
+                            error: "Failed to decode watermarked audio",
+                            details: decodeError.message
+                        });
+                    }
+                } else {
+                    displayResult(result);
+                }
+
+            } catch (error) {
+                console.error('API Error:', error);
+                displayResult({ error: "Network or API call failed.", details: error.toString() });
+            } finally {
+                hideLoading('embedButton', 'embed-text');
+            }
+        }
+    </script>
+</body>
+
+</html>

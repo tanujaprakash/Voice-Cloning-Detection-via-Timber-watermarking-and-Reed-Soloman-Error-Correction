@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+backend/uploads/*
+backend/temp_files/*
+!backend/uploads/.gitkeep
+!backend/temp_files/.gitkeep
+
+# Model files (optional - uncomment if you don't want to push models)
+# models/*.pkl
+
+# Logs
+*.log

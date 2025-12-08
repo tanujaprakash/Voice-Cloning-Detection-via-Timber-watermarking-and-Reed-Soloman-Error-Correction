@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Watermark Embed - Fixed</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        input,
+        button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Watermark Embed - Direct Download Test</h1>
+        <input type="file" id="audioFile" accept=".wav">
+        <input type="text" id="watermarkText" placeholder="Enter watermark (e.g., Test123)" value="Test123">
+        <button onclick="embedWatermark()">Embed Watermark & Download</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function embedWatermark() {
+            const file = document.getElementById('audioFile').files[0];
+            const watermark = document.getElementById('watermarkText').value;
+
+            if (!file) {
+                alert('Please select an audio file');
+                return;
+            }
+            if (!watermark) {
+                alert('Please enter watermark text');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('audio', file);
+            formData.append('bits', watermark);
+
+            try {
+                document.getElementById('result').innerHTML = 'Embedding watermark...';
+
+                const response = await fetch('http://127.0.0.1:5000/embed', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.status !== 200) {
+                    const error = await response.text();
+                    document.getElementById('result').innerHTML = `<span style="color:red">Error: ${error}</span>`;
+                    return;
+                }
+
+                // Server returns file directly
+                const blob = await response.blob();
+
+                // Get filename from Content-Disposition header
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = `watermarked_${watermark.replace(/[^a-zA-Z0-9]/g, '_')}.wav`;
+
+                if (contentDisposition) {
+                    const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                    if (match && match[1]) {
+                        filename = match[1].replace(/['"]/g, '');
+                    }
+                }
+
+                // Trigger download
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+
+                document.getElementById('result').innerHTML = `
+                    <span style="color:green">✅ Success!</span><br>
+                    Downloaded as: <strong>${filename}</strong><br>
+                    File size: ${(blob.size / 1024).toFixed(2)} KB
+                `;
+
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<span style="color:red">Error: ${error.message}</span>`;
+            }
+        }
+    </script>
+</body>
+
+</html>

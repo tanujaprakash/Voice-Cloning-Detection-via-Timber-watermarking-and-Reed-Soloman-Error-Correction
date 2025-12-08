@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Test Embed Download</title>
+</head>
+
+<body>
+    <h1>Test Watermark Embed Download</h1>
+    <input type="file" id="audioFile" accept=".wav">
+    <input type="text" id="watermarkText" placeholder="Enter watermark" value="Test123">
+    <button onclick="testEmbed()">Test Embed</button>
+    <div id="result"></div>
+
+    <script>
+        async function testEmbed() {
+            const file = document.getElementById('audioFile').files[0];
+            const watermark = document.getElementById('watermarkText').value;
+
+            if (!file || !watermark) {
+                alert('Please select file and enter watermark');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('audio', file);
+            formData.append('bits', watermark);
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/embed', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                console.log('Server response:', result);
+
+                document.getElementById('result').innerHTML = `
+                    <h3>Server Response:</h3>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                    <p>Filename from server: <strong>${result.filename}</strong></p>
+                `;
+
+                if (result.embedded_audio_base64) {
+                    // Decode base64
+                    const byteCharacters = atob(result.embedded_audio_base64);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: 'audio/wav' });
+
+                    // Create download link
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = result.filename;
+
+                    console.log('Download filename set to:', a.download);
+                    console.log('Blob URL:', url);
+
+                    document.body.appendChild(a);
+                    a.click();
+
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+
+                    document.getElementById('result').innerHTML += `
+                        <p style="color: green;">✅ Download triggered with filename: ${a.download}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+
+</html>

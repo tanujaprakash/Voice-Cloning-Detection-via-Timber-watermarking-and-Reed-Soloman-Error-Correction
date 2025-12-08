@@ -1,0 +1,160 @@
+/* Global */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f7f9fb;
+    margin: 0;
+    padding: 0;
+}
+
+/* Card styling */
+.card {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    transition: opacity 0.3s ease;
+}
+
+/* Buttons */
+.btn {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background: #4f46e5;
+    color: white;
+    border: none;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: #4338ca;
+}
+
+.btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* File input */
+.file-input {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    background-color: #f9fafb;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+/* Tabs */
+.tab-btn {
+    cursor: pointer;
+    padding: 0.75rem;
+    font-weight: 600;
+    border-bottom-width: 2px;
+    border-color: transparent;
+    transition: all 0.2s ease-in-out;
+    color: #6b7280;
+}
+
+.tab-btn:hover {
+    background-color: #eef2ff;
+}
+
+.tab-btn.active {
+    border-color: #4f46e5 !important;
+    color: #4f46e5;
+    background: #ffffff;
+}
+
+/* Section Control */
+.test-section {
+    display: none;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.35s ease-in-out;
+}
+
+.test-section.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Progress bars */
+.progress-bar-container {
+    width: 100%;
+    background-color: #e2e8f0;
+    height: 1rem;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 0.5rem;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Green/Red classes */
+.bg-green {
+    background-color: #22c55e;
+}
+
+.bg-red {
+    background-color: #ef4444;
+}
+
+/* Results container */
+#results {
+    display: none;
+    background: #eef6ff;
+    border-left: 4px solid #4f46e5;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+#results.show {
+    display: block;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+#result-output > div {
+    margin-bottom: 1rem;
+}
+
+#result-output h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+/* Labels for progress bars */
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+/* Fade animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Utility */
+.hidden {
+    display: none;
+}
