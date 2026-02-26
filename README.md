@@ -81,7 +81,7 @@ With the rise of AI voice cloning technology, there's an increasing threat of vo
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/YOUR_USERNAME/Voice-Cloning-Detection-via-Timber-watermarking-and-Reed-Soloman-Error-Correction.git
+git clone https://github.com/tanujaprakash/Voice-Cloning-Detection-via-Timber-watermarking-and-Reed-Soloman-Error-Correction.git
 cd Voice-Cloning-Detection-via-Timber-watermarking-and-Reed-Soloman-Error-Correction
 ```
 
